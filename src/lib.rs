@@ -177,15 +177,14 @@ pub mod bit_map {
             println!("{:?}\n{:?}\n", self.file_header, self.bin_header);
         }
 
-        // Kill MEEEEEEEEEE
-        pub fn transform(&mut self) {
-            self.pixel_array.pixel_array = self.pixel_array.pixel_array.iter().map(|pixel| { pixel.convert_to_grayscale() }).collect();
-            // self.pixel_array = self.pixel_array.iter().map(|pixel| { pixel.quantize_grayscale_1bit() }).collect();
+        
+        pub fn dither_floydsteinberg(&mut self, nbits: i32) {
+            // self.pixel_array.pixel_array = self.pixel_array.pixel_array.iter().map(|pixel| { pixel.convert_to_grayscale() }).collect();
 
             for y in 0..(self.bin_header.pixel_height - 1) {
                 for x in 0..(self.bin_header.pixel_width - 1) {
                     let original = self.pixel_array.get_pixel(x, y);
-                    let quantized = original.quantize_grayscale_2bit();
+                    let quantized = original.quantize_rgb_nbit(nbits);
 
                     let error:[i32; 3] = [
                         (original.r as i32 - quantized.r as i32), 
@@ -200,11 +199,17 @@ pub mod bit_map {
                         let x = x + offset.0;
                         let y = y + offset.1;
                         let pixel = self.pixel_array.get_pixel(x, y);
+                        
                         let mut k = [pixel.r as i32, pixel.g as i32, pixel.b as i32];
                         k[0] += (error[0] as f32 * error_bias) as i32;
                         k[1] += (error[1] as f32 * error_bias) as i32;
                         k[2] += (error[2] as f32 * error_bias) as i32;
-                        let pixel = Pixel { r: k[0] as u8, g: k[1] as u8, b: k[2] as u8 };
+
+                        let pixel = Pixel { 
+                            r: k[0].clamp(0, 255) as u8,
+                            g: k[1].clamp(0, 255) as u8,
+                            b: k[2].clamp(0, 255) as u8 
+                        };
                         self.pixel_array.set_pixel(x, y, pixel);
                     };
 
@@ -295,22 +300,48 @@ pub mod bit_map {
             Pixel {r: grayscale, g: grayscale, b: grayscale}
         }
 
-        fn quantize_grayscale_1bit(&self) -> Pixel {
-            if self.r < 128 {
-                return Pixel{ r: 0, g: 0, b: 0 };
-            } else {
-                return Pixel {r: 255, g: 255, b: 255};
-            }
+        fn quantize_grayscale_nbit(&self, nbit: i32) -> Pixel {
+
+            let levels = ((1 << nbit) - 1) as f32;
+            let color = (self.r as f32 / 255.0f32) * levels;
+            let color = color.round();
+            let color = color / levels * 255.0f32;
+            let color = color.clamp(0.0f32, 255.0f32);
+
+            let color = color as u8;
+
+            Pixel { r: color, g: color, b: color }
         }
 
-        fn quantize_grayscale_2bit(&self) -> Pixel {
-            let x = match self.r {
-                x if x < 85 => 0,
-                x if x < 170 => 170,
-                _ => 255,
-            };
+        fn quantize_rgb_nbit(&self, nbit: i32) -> Pixel {
 
-            Pixel {r: x, g: x, b: x }
+            let levels = ((1 << nbit) - 1) as f32;
+            // Red
+            let red = (self.r as f32 / 255.0f32) * levels;
+            let red = red.round();
+            let red = red / levels * 255.0f32;
+            let red = red.clamp(0.0f32, 255.0f32);
+
+            let red = red as u8;
+
+            // Green
+            let green = (self.g as f32 / 255.0f32) * levels;
+            let green = green.round();
+            let green = green / levels * 255.0f32;
+            let green = green.clamp(0.0f32, 255.0f32);
+
+            let green = green as u8;
+
+            // Blue
+            let blue = (self.b as f32 / 255.0f32) * levels;
+            let blue = blue.round();
+            let blue = blue / levels * 255.0f32;
+            let blue = blue.clamp(0.0f32, 255.0f32);
+
+            let blue = blue as u8;
+
+
+            Pixel { r: red, g: green, b: blue }
         }
     }
     struct PixelArray {

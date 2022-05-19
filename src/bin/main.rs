@@ -25,9 +25,9 @@ fn main() {
             bit_map.debug();
 
             // Transform the image
-            bit_map.transform();
+            bit_map.dither_floydsteinberg(1);
 
-            let size = bit_map.save(Path::new("edited.bmp")).unwrap_or_else(|err| {
+            let size = bit_map.save(Path::new("output/edited.bmp")).unwrap_or_else(|err| {
                 eprintln!("Error while saving bitmap file: {}", err);
                 process::exit(1);
             });
