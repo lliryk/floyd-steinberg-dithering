@@ -24,8 +24,10 @@ fn main() {
             });
             bit_map.debug();
 
+            let pallete = Pallete::new(&["white", "black", "red", "green", "blue"]);
+
             // Transform the image
-            bit_map.dither_floydsteinberg(1);
+            bit_map.dither_floydsteinberg(&pallete, 3);
 
             let size = bit_map.save(Path::new("output/edited.bmp")).unwrap_or_else(|err| {
                 eprintln!("Error while saving bitmap file: {}", err);
