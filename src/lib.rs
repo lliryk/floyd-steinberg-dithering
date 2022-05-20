@@ -2,39 +2,79 @@ pub mod pixels;
 pub mod bit_map;
 
 pub mod config {
-    use std::path::PathBuf;
-    use std::path::Path;
+    use clap::Parser;
+    use thiserror::Error;
+    use std::str::FromStr;
+
+    use crate::pixels::Pallete;
 
     #[derive(Debug)]
     pub enum Extension {
         BMP,
     }
 
-    #[derive(Debug)]
-    pub struct Config {
-        pub filename: std::path::PathBuf,
-        pub extension: Extension,
+    #[derive(Error, Debug)]
+    pub enum Issue {
+        #[error("Unknown Extension: {0}")]
+        UnknownExtension(String),
+
+        #[error("Could not process extension")]
+        InvalidExtension,
     }
 
-    impl Config {
-        pub fn new(args: &[String]) -> Result<Config, &'static str> {
-            if args.len() < 2 {
-                return Err("Not enough arguments!");
-            }
-
-            let filename = args[1].clone();
-
-            let extension = filename.split('.').last();
-
+    impl FromStr for Extension {
+        type Err = Issue;
+        
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            let extension = s.split('.').last();
+            
             if let Some(extension) = extension {
                 let extension: Extension = match extension {
                     "bmp" => { Extension::BMP },
-                    _ => { return Err("Unknown file extension") },
+                    _ => { return Err(Issue::UnknownExtension(extension.to_string())) },
                 };
-                return Ok(Config { filename: PathBuf::from(Path::new(&filename)), extension });
+                return Ok(extension);
             }
-            
-            Err("Could not process filename")
+
+            Err(Issue::InvalidExtension)
+        }
+    }
+
+    /// Basic implementation of the floyd-steinberg dithering algorithm
+    #[derive(Parser, Debug)]
+    #[clap(author, version, about, long_about = None)]
+    pub struct Config {
+        /// Path to image to process
+        #[clap(short, long)]
+        pub filename: std::path::PathBuf,
+
+        /// Colors seperated by commas: "red,green, blue"
+        #[clap(short, long)]
+        pub color_string: String,
+
+        /// Path of output file
+        #[clap(short, long)]
+        pub output: std::path::PathBuf,
+    }
+
+    impl Config {
+        pub fn ext(&self) -> Result<Extension, Issue> {
+            if let Some(ext) = self.filename.extension() {
+                if let Some(ext) = ext.to_str() {
+                    match Extension::from_str(ext) {
+                        Ok(ext) => { return Ok(ext) },
+                        Err(err) => { return Err(err) }
+                    }
+                }
+            } 
+            Err(Issue::InvalidExtension)     
+        }
+
+        pub fn pallete(&self) -> Pallete {
+            let colors: Vec<&str> = self.color_string.split(',')
+            .map(str::trim).collect();
+
+            Pallete::new(colors.as_slice())
         }
     }
 }
