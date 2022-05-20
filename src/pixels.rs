@@ -37,7 +37,7 @@ impl Pixel {
     }
 
     #[allow(dead_code)]
-    fn quantize_grayscale_nbit(&self, nbit: i32) -> Pixel {
+    fn quantize_grayscale_nbit(&self, nbit: u8) -> Pixel {
 
         let levels = ((1 << nbit) - 1) as f32;
         let color = (self.r as f32 / 255.0f32) * levels;
@@ -50,7 +50,7 @@ impl Pixel {
         Pixel { r: color, g: color, b: color }
     }
 
-    fn quantize_rgb_nbit(&self, pallete: &Pallete, nbit: i32) -> Pixel {
+    fn quantize_rgb_nbit(&self, pallete: &Pallete, nbit: u8) -> Pixel {
 
         let quantised_color = self.quantize_rgb_pallete(&pallete.colors);
 
@@ -229,7 +229,7 @@ impl PixelArray {
         self.pixel_array.clone()
     }
 
-    pub fn dither_floydsteinberg(&mut self, pallete: &Pallete, nbits: i32) {
+    pub fn dither_floydsteinberg(&mut self, pallete: &Pallete, nbits: u8) {
         let height: i32 = self.height.try_into().unwrap();
         let width: i32 = self.width.try_into().unwrap();
         for y in 0..(height - 1) {

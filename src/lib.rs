@@ -51,6 +51,10 @@ pub mod config {
         /// HTML basic colors seperated by commas: "red, green, blue"
         #[clap(short, long)]
         pub color_string: String,
+       
+        /// Bits per color
+        #[clap(short, long)]
+        pub bits: u8,
 
         /// Path of output file
         #[clap(short, long)]

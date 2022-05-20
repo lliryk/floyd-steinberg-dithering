@@ -140,7 +140,7 @@ impl BitMap {
     }
 
     
-    pub fn dither_floydsteinberg(&mut self, pallete: &Pallete, nbits: i32) {
+    pub fn dither_floydsteinberg(&mut self, pallete: &Pallete, nbits: u8) {
         self.pixel_array.dither_floydsteinberg(pallete, nbits);
     }
     }

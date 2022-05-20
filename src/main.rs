@@ -10,8 +10,6 @@ fn main() {
     
     let config = Config::parse();
 
-    println!("{:?}", config);
-
     let ext = config.ext().unwrap_or_else(|err| {
         eprintln!("Error while processing file extension: {}", err);
         process::exit(1);
@@ -23,19 +21,21 @@ fn main() {
                 eprintln!("Error while processing bitmap file: {}", err);
                 process::exit(1);
             });
-            bit_map.debug();
 
             let pallete = config.pallete();
 
             // Transform the image
-            bit_map.dither_floydsteinberg(&pallete, 3);
+            bit_map.dither_floydsteinberg(&pallete, config.bits);
 
             let size = bit_map.save(config.output.as_path()).unwrap_or_else(|err| {
                 eprintln!("Error while saving bitmap file: {}", err);
                 process::exit(1);
             });
             
-            println!("Wrote {} bytes", size);
+            println!("Wrote {} bytes to {}", size, match config.output.to_str() {
+                Some(filename) => { filename },
+                None => {""}
+            });
             
         }
     }
