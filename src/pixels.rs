@@ -156,7 +156,7 @@ impl Pallete {
             if let Some(color_pixel) = color_map.get(color) {
                 colors.push(color_pixel.clone());
             } else {
-                eprint!("Unknown color: {}", color);
+                eprintln!("Unknown color: {}", color);
             }
         }
 
