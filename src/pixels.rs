@@ -132,6 +132,25 @@ impl Pallete {
         color_map.insert("white", Pixel::new(255, 255, 255));
         color_map.insert("black", Pixel::new(0, 0, 0));
 
+        let color_map = HashMap::from([
+            ("white", Pixel::new(255, 255, 255)),
+            ("silver", Pixel::new(191, 191, 191)),
+            ("black", Pixel::new(0, 0, 0)),
+            ("gray", Pixel::new(127, 127, 127)),
+            ("red", Pixel::new(255, 0, 0)),
+            ("maroon", Pixel::new(127, 0, 0)),
+            ("yellow", Pixel::new(255, 255, 0)),
+            ("olive", Pixel::new(127, 127, 0)),
+            ("lime", Pixel::new(0, 255, 0)),
+            ("green", Pixel::new(0, 255, 0)),
+            ("aqua", Pixel::new(0, 255, 255)),
+            ("teal", Pixel::new(0, 127, 127)),
+            ("blue", Pixel::new(0, 0, 255)),
+            ("navy", Pixel::new(0, 0, 127)),
+            ("fuchsia", Pixel::new(255, 0, 255)),
+            ("purple", Pixel::new(127, 0, 127)),
+        ]);
+
         let mut colors = Vec::new();
         for color in color_names {
             if let Some(color_pixel) = color_map.get(color) {

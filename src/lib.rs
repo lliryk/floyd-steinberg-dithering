@@ -48,7 +48,7 @@ pub mod config {
         #[clap(short, long)]
         pub filename: std::path::PathBuf,
 
-        /// Colors seperated by commas: "red,green, blue"
+        /// HTML basic colors seperated by commas: "red, green, blue"
         #[clap(short, long)]
         pub color_string: String,
 
@@ -71,10 +71,12 @@ pub mod config {
         }
 
         pub fn pallete(&self) -> Pallete {
-            let colors: Vec<&str> = self.color_string.split(',')
-            .map(str::trim).collect();
+            let colors: Vec<String> = self.color_string.split(',')
+            .map(str::trim).map(str::to_ascii_lowercase).collect();
 
-            Pallete::new(colors.as_slice())
+            let color_ref: Vec<&str> = colors.iter().map(|x| x.as_ref()).collect();
+
+            Pallete::new(&color_ref)
         }
     }
 }
