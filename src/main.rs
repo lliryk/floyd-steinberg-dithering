@@ -5,6 +5,7 @@ use std::path::Path;
 use floyd_dithering::config::Config;
 use floyd_dithering::config::Extension;
 use floyd_dithering::bit_map::*;
+use floyd_dithering::pixels::Pallete;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -24,7 +25,7 @@ fn main() {
             });
             bit_map.debug();
 
-            let pallete = Pallete::new(&["white", "black", "red", "green", "blue"]);
+            let pallete = Pallete::new(&["red", "green", "blue"]);
 
             // Transform the image
             bit_map.dither_floydsteinberg(&pallete, 3);
