@@ -123,15 +123,6 @@ pub struct Pallete {
 impl Pallete {
     pub fn new(color_names: &[&str]) -> Pallete {
 
-        // Don't know how to build this statically
-        let mut color_map = HashMap::new();
-
-        color_map.insert("red", Pixel::new(255, 0, 0));
-        color_map.insert("green", Pixel::new(0, 255, 0));
-        color_map.insert("blue", Pixel::new(0, 0, 255));
-        color_map.insert("white", Pixel::new(255, 255, 255));
-        color_map.insert("black", Pixel::new(0, 0, 0));
-
         let color_map = HashMap::from([
             ("white", Pixel::new(255, 255, 255)),
             ("silver", Pixel::new(191, 191, 191)),
